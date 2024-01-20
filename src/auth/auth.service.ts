@@ -37,5 +37,7 @@ export class AuthService {
     if (!isPasswordValid) {
       throw new ForbiddenException('Invalid password');
     }
+
+    return {};
   }
 }
