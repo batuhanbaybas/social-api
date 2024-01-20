@@ -5,9 +5,9 @@ import { AuthUserDto } from './dto/auth.dto';
 @Injectable()
 export class AuthService {
   constructor(private readonly prisma: PrismaService) {}
-  register(createAuthDto: AuthUserDto) {
+  async register(createAuthDto: AuthUserDto) {
     const { email, password } = createAuthDto;
-    return this.prisma.user.create({
+    return await this.prisma.user.create({
       data: {
         email,
         password,
@@ -15,15 +15,20 @@ export class AuthService {
     });
   }
 
-  login(loginUser: AuthUserDto) {
+  async login(loginUser: AuthUserDto) {
     const { email, password } = loginUser;
-    const user = this.prisma.user.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: {
         email,
       },
     });
+
     if (!user) {
-      throw new ForbiddenException();
+      throw new ForbiddenException('Invalid credentials');
+    }
+
+    if (user.password !== password) {
+      throw new ForbiddenException('Invalid credentials');
     }
   }
 }
