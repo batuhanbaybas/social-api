@@ -1,16 +1,22 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AuthUserDto } from './dto/auth.dto';
+import { hashPassword, verifyPassword } from 'src/helper/hasher';
 
 @Injectable()
 export class AuthService {
   constructor(private readonly prisma: PrismaService) {}
   async register(createAuthDto: AuthUserDto) {
     const { email, password } = createAuthDto;
+    const hashedPassword = await hashPassword(password);
     return await this.prisma.user.create({
       data: {
         email,
-        password,
+        password: hashedPassword,
       },
     });
   }
@@ -24,11 +30,12 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new ForbiddenException('Invalid credentials');
+      throw new NotFoundException('User not found');
     }
 
-    if (user.password !== password) {
-      throw new ForbiddenException('Invalid credentials');
+    const isPasswordValid = await verifyPassword(user.password, password);
+    if (!isPasswordValid) {
+      throw new ForbiddenException('Invalid password');
     }
   }
 }
