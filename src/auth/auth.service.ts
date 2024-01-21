@@ -6,19 +6,26 @@ import {
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AuthUserDto } from './dto/auth.dto';
 import { hashPassword, verifyPassword } from 'src/helper/hasher';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly jwt: JwtService,
+    private readonly config: ConfigService,
+  ) {}
   async register(createAuthDto: AuthUserDto) {
     const { email, password } = createAuthDto;
     const hashedPassword = await hashPassword(password);
-    return await this.prisma.user.create({
+    const user = await this.prisma.user.create({
       data: {
         email,
         password: hashedPassword,
       },
     });
+    return await this.signToken(user.id, user.email);
   }
 
   async login(loginUser: AuthUserDto) {
@@ -38,6 +45,17 @@ export class AuthService {
       throw new ForbiddenException('Invalid password');
     }
 
-    return {};
+    return await this.signToken(user.id, user.email);
+  }
+
+  async signToken(userID: string, email: string) {
+    const payload = { username: email, sub: userID };
+    const token = await this.jwt.signAsync(payload, {
+      expiresIn: '1h',
+      secret: this.config.get<string>('JWT_SECRET'),
+    });
+    return {
+      access_token: token,
+    };
   }
 }
