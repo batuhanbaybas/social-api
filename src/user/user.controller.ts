@@ -9,6 +9,6 @@ export class UserController {
   @UseGuards(AuthGuard('jwt'))
   @Get('/me')
   async getMe(@Req() req: Request) {
-    console.log(req.user);
+    return await this.userService.getMe(req.user['userId']);
   }
 }
