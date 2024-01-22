@@ -46,4 +46,20 @@ export class CommentService {
       throw new ForbiddenException(error.message);
     }
   }
+
+  async deleteComment(id: string, res: Response) {
+    try {
+      await this.prisma.comment.delete({
+        where: {
+          id: id,
+        },
+      });
+      res.status(HttpStatus.OK).json({
+        status: true,
+        message: 'Comment deleted successfully',
+      });
+    } catch (error) {
+      throw new ForbiddenException(error.message);
+    }
+  }
 }
