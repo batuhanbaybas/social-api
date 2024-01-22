@@ -49,6 +49,7 @@ model Feed {
   id         String   @id @default(cuid())
   title      String
   content    String
+  fileUrl    String?
   owner      User     @relation(fields: [ownerId], references: [id])
   ownerId    String
   commentsId String[]

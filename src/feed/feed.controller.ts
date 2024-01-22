@@ -9,12 +9,15 @@ import {
   Put,
   Req,
   Res,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { CreateFeedDto } from './dto/feed-dto';
 import { IsFeedOwnerGuard } from './guard/IsOwner.guard';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('feed')
 export class FeedController {
@@ -31,13 +34,20 @@ export class FeedController {
     return await this.feedService.getFeedById(postId, res);
   }
   @UseGuards(AuthGuard('jwt'))
+  @UseInterceptors(FileInterceptor('file'))
   @Post('/create')
   async createFeed(
     @Req() req: Request,
     @Body() body: CreateFeedDto,
     @Res() res: Response,
+    @UploadedFile() file: Express.Multer.File,
   ) {
-    return await this.feedService.createFeed(body, req.user['userId'], res);
+    return await this.feedService.createFeed(
+      body,
+      req.user['userId'],
+      file,
+      res,
+    );
   }
 
   @UseGuards(AuthGuard('jwt'), IsFeedOwnerGuard)

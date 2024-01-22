@@ -27,13 +27,19 @@ export class FeedService {
     }
   }
 
-  async createFeed(feed: CreateFeedDto, userId: string, res: Response) {
+  async createFeed(
+    feed: CreateFeedDto,
+    userId: string,
+    file: Express.Multer.File,
+    res: Response,
+  ) {
     const { title, content } = feed;
     try {
       await this.prisma.feed.create({
         data: {
           title,
           content,
+          fileUrl: file.path,
           ownerId: userId,
         },
       });
