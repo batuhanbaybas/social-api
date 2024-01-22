@@ -29,7 +29,6 @@ export class FeedService {
     res: Response,
   ) {
     const { title, content } = feed;
-    console.log(file);
     try {
       await this.prisma.feed.create({
         data: {
