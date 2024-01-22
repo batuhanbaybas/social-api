@@ -1,6 +1,7 @@
 import { Body, Controller, Post, Req, Res } from '@nestjs/common';
 import { CommentService } from './comment.service';
 import { Request, Response } from 'express';
+import { CreateCommentDto } from './dto/create-comment.dto';
 
 @Controller('comment')
 export class CommentController {
@@ -9,7 +10,7 @@ export class CommentController {
   @Post('create')
   async createComment(
     @Req() req: Request,
-    @Body() body: { content: string; postId: string },
+    @Body() body: CreateCommentDto,
     @Res() res: Response,
   ) {
     const userId = req.user['userId'];
