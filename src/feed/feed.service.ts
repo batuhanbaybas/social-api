@@ -38,25 +38,43 @@ export class FeedService {
     }
   }
 
-  async updateFeed(id: string, body: CreateFeedDto, res: Response) {
+  async updateFeed(id: string, body: any, res: Response) {
+    const { title, content } = body;
     try {
       await this.prisma.feed.update({
         where: {
-          id,
+          id: id,
         },
         data: {
-          ...body,
+          title,
+          content,
         },
       });
-      res.status(HttpStatus.CREATED).json({
+      return res.status(HttpStatus.CREATED).json({
         status: true,
         message: 'Feed updated successfully',
       });
     } catch (error) {
-      throw new ForbiddenException(error.message);
+      throw error.message;
     }
   }
   async deleteFeed() {
     return 'Delete Feed';
+  }
+
+  async getFeedById(id: string, res?: Response) {
+    try {
+      const feed = await this.prisma.feed.findUnique({
+        where: {
+          id,
+        },
+      });
+      return res.status(HttpStatus.OK).json({
+        status: true,
+        data: feed,
+      });
+    } catch (error) {
+      throw new ForbiddenException(error.message);
+    }
   }
 }

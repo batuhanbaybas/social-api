@@ -4,6 +4,7 @@ import {
   Controller,
   Delete,
   Get,
+  Param,
   Post,
   Put,
   Req,
@@ -13,6 +14,7 @@ import {
 import { Request, Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { CreateFeedDto } from './dto/feed-dto';
+import { IsOwnerGuard } from './guard/IsOwner.guard';
 
 @Controller('feed')
 export class FeedController {
@@ -22,6 +24,12 @@ export class FeedController {
   async getAllFeeds(@Res() res: Response) {
     return await this.feedService.getAllFeeds(res);
   }
+
+  @Get('/:id')
+  async getFeedById(@Param() id: string, @Res() res: Response) {
+    const postId = id['id'];
+    return await this.feedService.getFeedById(postId, res);
+  }
   @UseGuards(AuthGuard('jwt'))
   @Post('/create')
   async createFeed(
@@ -29,7 +37,7 @@ export class FeedController {
     @Body() body: CreateFeedDto,
     @Res() res: Response,
   ) {
-    return this.feedService.createFeed(body, req.user['userId'], res);
+    return await this.feedService.createFeed(body, req.user['userId'], res);
   }
 
   @UseGuards(AuthGuard('jwt'))
@@ -38,14 +46,14 @@ export class FeedController {
     return 'Delete Feed';
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), IsOwnerGuard)
   @Put('/update/:id')
   async updateFeed(
-    @Req() req: Request,
+    @Param() id: string,
     @Body() body: CreateFeedDto,
     @Res() res: Response,
   ) {
-    const { id } = req.params;
-    return await this.feedService.updateFeed(id, body, res);
+    const postId = id['id'];
+    return await this.feedService.updateFeed(postId, body, res);
   }
 }
