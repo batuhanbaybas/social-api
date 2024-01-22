@@ -11,24 +11,54 @@ datasource db {
   relationMode = "prisma"
 }
 
-model User {
+model Role {
   id        String   @id @default(cuid())
-  email     String   @unique
-  userName  String?
-  password  String
+  name      String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  User      User[]
+}
+
+model User {
+  id        String    @id @default(cuid())
+  email     String    @unique
+  userName  String?
+  password  String
+  roleId    String?
+  role      Role?     @relation(fields: [roleId], references: [id])
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   Feed      Feed[]
+  Comment   Comment[]
+
+  @@index([roleId], name: "roleId")
 }
 
 model Feed {
+  id         String   @id @default(cuid())
+  title      String
+  content    String
+  owner      User     @relation(fields: [ownerId], references: [id])
+  ownerId    String
+  commentsId String[]
+  comments   Comment  @relation(fields: [commentsId], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([commentsId], name: "commentsId")
+  @@index([ownerId], name: "ownerId")
+}
+
+model Comment {
   id        String   @id @default(cuid())
-  title     String
   content   String
-  owner     User     @relation(fields: [ownerId], references: [id])
-  ownerId   String
+  userId    String
+  owner     User     @relation(fields: [userId], references: [id])
+  feedId    String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  Feed      Feed[]
 
-  @@index([ownerId], name: "ownerId")
+  @@index([userId], name: "userId")
+  @@index([feedId], name: "feedId")
 }

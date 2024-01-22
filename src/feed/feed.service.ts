@@ -3,13 +3,21 @@ import { Response } from 'express';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateFeedDto } from './dto/feed-dto';
 
-//TODO:(Batu) auth guard is ok but what if the different user tries to update the feed of other user ?
 @Injectable()
 export class FeedService {
   constructor(private readonly prisma: PrismaService) {}
   async getAllFeeds(res: Response) {
     try {
-      const feeds = await this.prisma.feed.findMany();
+      const feeds = await this.prisma.feed.findMany({
+        include: {
+          owner: true,
+          comments: {
+            include: {
+              owner: true,
+            },
+          },
+        },
+      });
       res.status(HttpStatus.OK).json({
         status: true,
         data: feeds,
@@ -79,6 +87,14 @@ export class FeedService {
       const feed = await this.prisma.feed.findUnique({
         where: {
           id,
+        },
+        include: {
+          owner: true,
+          comments: {
+            include: {
+              owner: true,
+            },
+          },
         },
       });
       return res.status(HttpStatus.OK).json({
