@@ -11,11 +11,6 @@ export class FeedService {
       const feeds = await this.prisma.feed.findMany({
         include: {
           owner: true,
-          comments: {
-            include: {
-              owner: true,
-            },
-          },
         },
       });
       res.status(HttpStatus.OK).json({
@@ -34,12 +29,13 @@ export class FeedService {
     res: Response,
   ) {
     const { title, content } = feed;
+    console.log(file);
     try {
       await this.prisma.feed.create({
         data: {
           title,
           content,
-          fileUrl: file.path,
+          fileUrl: file.buffer.toString('base64'),
           ownerId: userId,
         },
       });
