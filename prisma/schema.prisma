@@ -19,6 +19,15 @@ model Role {
   User      User[]
 }
 
+model Friends {
+  id        String   @id @default(cuid())
+  userId    String
+  friendId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  User      User[]
+}
+
 model User {
   id        String    @id @default(cuid())
   email     String    @unique
@@ -30,7 +39,10 @@ model User {
   updatedAt DateTime  @updatedAt
   Feed      Feed[]
   Comment   Comment[]
+  Friends   Friends?  @relation(fields: [friendsId], references: [id])
+  friendsId String?
 
+  @@index([friendsId], name: "friendsId")
   @@index([roleId], name: "roleId")
 }
 
