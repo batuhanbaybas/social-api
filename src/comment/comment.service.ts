@@ -26,4 +26,24 @@ export class CommentService {
       throw new ForbiddenException(error.message);
     }
   }
+
+  async updateComment(id: string, body: CreateCommentDto, res: Response) {
+    const { content } = body;
+    try {
+      await this.prisma.comment.update({
+        where: {
+          id: id,
+        },
+        data: {
+          content,
+        },
+      });
+      res.status(HttpStatus.OK).json({
+        status: true,
+        message: 'Comment updated successfully',
+      });
+    } catch (error) {
+      throw new ForbiddenException(error.message);
+    }
+  }
 }
