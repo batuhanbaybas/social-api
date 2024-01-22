@@ -25,3 +25,6 @@ This is basic social media app API with NestJS and Docker. This project is for l
 - PostgreSQL (for database)
 - PrismaORM (for database ORM)
 - JWT  (for authentication)
+- argon2 (for hashing password)
+- class-validator (for validating data)
+- class-transformer (for transforming data)
