@@ -14,7 +14,7 @@ import {
 import { Request, Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { CreateFeedDto } from './dto/feed-dto';
-import { IsOwnerGuard } from './guard/IsOwner.guard';
+import { IsFeedOwnerGuard } from './guard/IsOwner.guard';
 
 @Controller('feed')
 export class FeedController {
@@ -40,20 +40,20 @@ export class FeedController {
     return await this.feedService.createFeed(body, req.user['userId'], res);
   }
 
-  @UseGuards(AuthGuard('jwt'))
-  @Delete('/delete')
-  async deleteFeed() {
-    return 'Delete Feed';
+  @UseGuards(AuthGuard('jwt'), IsFeedOwnerGuard)
+  @Delete('/delete/:id')
+  async deleteFeed(@Param() params: { id: string }, @Res() res: Response) {
+    return await this.feedService.deleteFeed(params.id, res);
   }
 
-  @UseGuards(AuthGuard('jwt'), IsOwnerGuard)
+  @UseGuards(AuthGuard('jwt'), IsFeedOwnerGuard)
   @Put('/update/:id')
   async updateFeed(
-    @Param() id: string,
+    @Param() params: { id: string },
     @Body() body: CreateFeedDto,
     @Res() res: Response,
   ) {
-    const postId = id['id'];
+    const postId = params.id;
     return await this.feedService.updateFeed(postId, body, res);
   }
 }

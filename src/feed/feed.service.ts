@@ -58,8 +58,20 @@ export class FeedService {
       throw error.message;
     }
   }
-  async deleteFeed() {
-    return 'Delete Feed';
+  async deleteFeed(id: string, res: Response) {
+    try {
+      await this.prisma.feed.delete({
+        where: {
+          id: id,
+        },
+      });
+      res.status(HttpStatus.OK).json({
+        status: true,
+        message: 'Feed deleted successfully',
+      });
+    } catch (error) {
+      throw new ForbiddenException(error.message);
+    }
   }
 
   async getFeedById(id: string, res?: Response) {
