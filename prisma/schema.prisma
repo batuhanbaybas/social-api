@@ -40,7 +40,7 @@ model User {
   Feed      Feed[]
   Comment   Comment[]
   Friends   Friends?  @relation(fields: [friendsId], references: [id])
-  friendsId String?
+  friendsId String[]  @default([])
 
   @@index([friendsId], name: "friendsId")
   @@index([roleId], name: "roleId")
