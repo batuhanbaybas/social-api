@@ -22,7 +22,6 @@ model Role {
 model Friends {
   id        String   @id @default(cuid())
   userId    String
-  friendId  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   User      User[]
