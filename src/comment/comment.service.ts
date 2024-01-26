@@ -1,5 +1,4 @@
-import { ForbiddenException, HttpStatus, Injectable } from '@nestjs/common';
-import { Response } from 'express';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 
@@ -7,7 +6,7 @@ import { CreateCommentDto } from './dto/create-comment.dto';
 export class CommentService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async createComment(body: CreateCommentDto, userId: string, res: Response) {
+  async createComment(body: CreateCommentDto, userId: string) {
     const { content, postId } = body;
     try {
       await this.prisma.comment.create({
@@ -18,16 +17,16 @@ export class CommentService {
         },
       });
 
-      res.status(HttpStatus.CREATED).json({
+      return {
         status: true,
         message: 'Comment created successfully',
-      });
+      };
     } catch (error) {
       throw new ForbiddenException(error.message);
     }
   }
 
-  async updateComment(id: string, body: CreateCommentDto, res: Response) {
+  async updateComment(id: string, body: CreateCommentDto) {
     const { content } = body;
     try {
       await this.prisma.comment.update({
@@ -38,26 +37,26 @@ export class CommentService {
           content,
         },
       });
-      res.status(HttpStatus.OK).json({
+      return {
         status: true,
         message: 'Comment updated successfully',
-      });
+      };
     } catch (error) {
       throw new ForbiddenException(error.message);
     }
   }
 
-  async deleteComment(id: string, res: Response) {
+  async deleteComment(id: string) {
     try {
       await this.prisma.comment.delete({
         where: {
           id: id,
         },
       });
-      res.status(HttpStatus.OK).json({
+      return {
         status: true,
         message: 'Comment deleted successfully',
-      });
+      };
     } catch (error) {
       throw new ForbiddenException(error.message);
     }

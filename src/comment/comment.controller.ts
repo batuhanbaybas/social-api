@@ -6,11 +6,10 @@ import {
   Post,
   Put,
   Req,
-  Res,
   UseGuards,
 } from '@nestjs/common';
 import { CommentService } from './comment.service';
-import { Request, Response } from 'express';
+import { Request } from 'express';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { ISCommentOwnerGuard } from './guard/IsCommentOwner.guard';
@@ -21,13 +20,9 @@ export class CommentController {
 
   @UseGuards(AuthGuard('jwt'))
   @Post('create')
-  async createComment(
-    @Req() req: Request,
-    @Body() body: CreateCommentDto,
-    @Res() res: Response,
-  ) {
+  async createComment(@Req() req: Request, @Body() body: CreateCommentDto) {
     const userId = req.user['userId'];
-    return await this.commentService.createComment(body, userId, res);
+    return await this.commentService.createComment(body, userId);
   }
 
   @UseGuards(AuthGuard('jwt'), ISCommentOwnerGuard)
@@ -35,16 +30,15 @@ export class CommentController {
   async updateComment(
     @Param() params: { id: string },
     @Body() body: CreateCommentDto,
-    @Res() res: Response,
   ) {
     const commentId = params.id;
-    return await this.commentService.updateComment(commentId, body, res);
+    return await this.commentService.updateComment(commentId, body);
   }
 
   @UseGuards(AuthGuard('jwt'), ISCommentOwnerGuard)
   @Delete('delete/:id')
-  async deleteComment(@Param() params: { id: string }, @Res() res: Response) {
+  async deleteComment(@Param() params: { id: string }) {
     const commentId = params.id;
-    return await this.commentService.deleteComment(commentId, res);
+    return await this.commentService.deleteComment(commentId);
   }
 }

@@ -4,16 +4,17 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Post,
   Put,
   Req,
-  Res,
   UploadedFile,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { Request } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { CreateFeedDto } from './dto/feed-dto';
 import { IsFeedOwnerGuard } from './guard/IsOwner.guard';
@@ -23,47 +24,44 @@ import { FileInterceptor } from '@nestjs/platform-express';
 export class FeedController {
   constructor(private readonly feedService: FeedService) {}
 
+  @HttpCode(HttpStatus.OK)
   @Get('/all')
-  async getAllFeeds(@Res() res: Response) {
-    return await this.feedService.getAllFeeds(res);
+  async getAllFeeds() {
+    return await this.feedService.getAllFeeds();
   }
 
+  @HttpCode(HttpStatus.OK)
   @Get('/:id')
-  async getFeedById(@Param() id: string, @Res() res: Response) {
+  async getFeedById(@Param() id: string) {
     const postId = id['id'];
-    return await this.feedService.getFeedById(postId, res);
+    return await this.feedService.getFeedById(postId);
   }
   @UseGuards(AuthGuard('jwt'))
   @UseInterceptors(FileInterceptor('file'))
+  @HttpCode(HttpStatus.CREATED)
   @Post('/create')
   async createFeed(
     @Req() req: Request,
     @Body() body: CreateFeedDto,
-    @Res() res: Response,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    return await this.feedService.createFeed(
-      body,
-      req.user['userId'],
-      file,
-      res,
-    );
+    return await this.feedService.createFeed(body, req.user['userId'], file);
   }
 
   @UseGuards(AuthGuard('jwt'), IsFeedOwnerGuard)
   @Delete('/delete/:id')
-  async deleteFeed(@Param() params: { id: string }, @Res() res: Response) {
-    return await this.feedService.deleteFeed(params.id, res);
+  async deleteFeed(@Param() params: { id: string }) {
+    return await this.feedService.deleteFeed(params.id);
   }
 
   @UseGuards(AuthGuard('jwt'), IsFeedOwnerGuard)
+  @HttpCode(HttpStatus.CREATED)
   @Put('/update/:id')
   async updateFeed(
     @Param() params: { id: string },
     @Body() body: CreateFeedDto,
-    @Res() res: Response,
   ) {
     const postId = params.id;
-    return await this.feedService.updateFeed(postId, body, res);
+    return await this.feedService.updateFeed(postId, body);
   }
 }
