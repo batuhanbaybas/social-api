@@ -27,14 +27,14 @@ export class FeedController {
   @HttpCode(HttpStatus.OK)
   @Get('/all')
   async getAllFeeds() {
-    return await this.feedService.getAllFeeds();
+    return this.feedService.getAllFeeds();
   }
 
   @HttpCode(HttpStatus.OK)
   @Get('/:id')
   async getFeedById(@Param() id: string) {
     const postId = id['id'];
-    return await this.feedService.getFeedById(postId);
+    return this.feedService.getFeedById(postId);
   }
   @UseGuards(AuthGuard('jwt'))
   @UseInterceptors(FileInterceptor('file'))
@@ -45,13 +45,13 @@ export class FeedController {
     @Body() body: CreateFeedDto,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    return await this.feedService.createFeed(body, req.user['userId'], file);
+    return this.feedService.createFeed(body, req.user['userId'], file);
   }
 
   @UseGuards(AuthGuard('jwt'), IsFeedOwnerGuard)
   @Delete('/delete/:id')
   async deleteFeed(@Param() params: { id: string }) {
-    return await this.feedService.deleteFeed(params.id);
+    return this.feedService.deleteFeed(params.id);
   }
 
   @UseGuards(AuthGuard('jwt'), IsFeedOwnerGuard)
@@ -62,6 +62,6 @@ export class FeedController {
     @Body() body: CreateFeedDto,
   ) {
     const postId = params.id;
-    return await this.feedService.updateFeed(postId, body);
+    return this.feedService.updateFeed(postId, body);
   }
 }

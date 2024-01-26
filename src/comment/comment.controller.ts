@@ -25,7 +25,7 @@ export class CommentController {
   @Post('create')
   async createComment(@Req() req: Request, @Body() body: CreateCommentDto) {
     const userId = req.user['userId'];
-    return await this.commentService.createComment(body, userId);
+    return this.commentService.createComment(body, userId);
   }
 
   @UseGuards(AuthGuard('jwt'), ISCommentOwnerGuard)
@@ -36,7 +36,7 @@ export class CommentController {
     @Body() body: CreateCommentDto,
   ) {
     const commentId = params.id;
-    return await this.commentService.updateComment(commentId, body);
+    return this.commentService.updateComment(commentId, body);
   }
 
   @UseGuards(AuthGuard('jwt'), ISCommentOwnerGuard)
@@ -44,6 +44,6 @@ export class CommentController {
   @Delete('delete/:id')
   async deleteComment(@Param() params: { id: string }) {
     const commentId = params.id;
-    return await this.commentService.deleteComment(commentId);
+    return this.commentService.deleteComment(commentId);
   }
 }
